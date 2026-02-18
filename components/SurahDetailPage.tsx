@@ -36,7 +36,31 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
   const [bookmarks, setBookmarks] = useLocalStorage<string[]>(`quran-bookmarks-${surahNumber}`, []);
   const [fontSize, setFontSize] = useLocalStorage<number>('quran-font-size', 16); // Base size in pixels
 
+  // Effect to initialize and clean up the single audio player instance.
+  // This runs only once when the component mounts.
   useEffect(() => {
+    audioRef.current = new Audio();
+    const audioPlayer = audioRef.current;
+
+    const handlePlaybackEnd = () => {
+      setPlayingAyah(null);
+    };
+    audioPlayer.addEventListener('ended', handlePlaybackEnd);
+
+    return () => {
+      audioPlayer.pause();
+      audioPlayer.removeEventListener('ended', handlePlaybackEnd);
+    };
+  }, []);
+
+  // Effect to fetch surah data when the surahNumber changes.
+  useEffect(() => {
+    // Stop any audio from the previous surah when changing.
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setPlayingAyah(null);
+    
     const fetchDetail = async () => {
       setLoading(true);
       const data = await getSurahDetail(surahNumber);
@@ -44,28 +68,18 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
       setLoading(false);
     };
     fetchDetail();
-    // Cleanup audio on component unmount
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
   }, [surahNumber]);
 
   const handlePlayPause = useCallback((ayahNumber: number, audioUrl: string) => {
+    const audioPlayer = audioRef.current;
+    if (!audioPlayer) return;
+
     if (playingAyah === ayahNumber) {
-      // Pause current audio
-      audioRef.current?.pause();
+      audioPlayer.pause();
       setPlayingAyah(null);
     } else {
-      // Pause previous audio if any
-      audioRef.current?.pause();
-      
-      // Play new audio
-      const newAudio = new Audio(audioUrl);
-      audioRef.current = newAudio;
-      newAudio.play().catch(e => console.error("Audio play failed:", e));
+      audioPlayer.src = audioUrl;
+      audioPlayer.play().catch(e => console.error("Audio play failed:", e));
       setPlayingAyah(ayahNumber);
 
       if (surahData) {
@@ -75,12 +89,8 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
             ayah: ayahNumber,
         });
       }
-
-      newAudio.onended = () => {
-        setPlayingAyah(null);
-      };
     }
-  }, [playingAyah, setLastRead, surahData]);
+  }, [playingAyah, surahData, setLastRead]);
 
   const toggleBookmark = (ayahNumber: number) => {
     const bookmarkId = `${surahNumber}:${ayahNumber}`;

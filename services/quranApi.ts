@@ -1,5 +1,5 @@
 
-import { Surah, FullSurahData, SurahDetail } from '../types';
+import { Surah, FullSurahData, SurahDetail, Ayah } from '../types';
 
 const API_BASE_URL = 'https://api.alquran.cloud/v1';
 
@@ -26,7 +26,7 @@ export const getAllSurahs = async (): Promise<Surah[]> => {
 
 export const getSurahDetail = async (surahNumber: number): Promise<FullSurahData | null> => {
     try {
-        const editions = 'quran-uthmani,en.transliteration,id.indonesian';
+        const editions = 'quran-uthmani,en.transliteration,id.indonesian,ar.alafasy';
         const response = await fetch(`${API_BASE_URL}/surah/${surahNumber}/editions/${editions}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch surah ${surahNumber}`);
@@ -36,6 +36,15 @@ export const getSurahDetail = async (surahNumber: number): Promise<FullSurahData
         const arabicData: SurahDetail = data.data[0];
         const transliterationData = data.data[1];
         const translationData = data.data[2];
+        const audioData: { ayahs: { audio: string }[] } = data.data[3];
+
+        const mergedAyahs: Ayah[] = arabicData.ayahs.map((ayah, index) => {
+          const audioUrl = audioData.ayahs[index]?.audio;
+          return {
+            ...ayah,
+            audio: audioUrl || '',
+          };
+        });
 
         return {
             number: arabicData.number,
@@ -44,7 +53,7 @@ export const getSurahDetail = async (surahNumber: number): Promise<FullSurahData
             englishNameTranslation: arabicData.englishNameTranslation,
             revelationType: arabicData.revelationType,
             numberOfAyahs: arabicData.numberOfAyahs,
-            arabicAyahs: arabicData.ayahs,
+            arabicAyahs: mergedAyahs,
             transliterationAyahs: transliterationData.ayahs.map((ayah: any) => ({number: ayah.number, text: ayah.text})),
             translationAyahs: translationData.ayahs.map((ayah: any) => ({number: ayah.number, text: ayah.text})),
         };
