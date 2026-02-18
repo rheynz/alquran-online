@@ -34,41 +34,9 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
   const [playingAyah, setPlayingAyah] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [bookmarks, setBookmarks] = useLocalStorage<string[]>(`quran-bookmarks-${surahNumber}`, []);
-  const [fontSize, setFontSize] = useLocalStorage<number>('quran-font-size', 16); // Base size in pixels
-
-  // Effect to initialize and clean up the single audio player instance.
-  // This runs only once when the component mounts.
-  useEffect(() => {
-    audioRef.current = new Audio();
-    const audioPlayer = audioRef.current;
-
-    const handlePlaybackEnd = () => {
-      setPlayingAyah(null);
-    };
-    audioPlayer.addEventListener('ended', handlePlaybackEnd);
-
-    return () => {
-      audioPlayer.pause();
-      audioPlayer.removeEventListener('ended', handlePlaybackEnd);
-    };
-  }, []);
-
-  // Effect to fetch surah data when the surahNumber changes.
-  useEffect(() => {
-    // Stop any audio from the previous surah when changing.
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    setPlayingAyah(null);
-    
-    const fetchDetail = async () => {
-      setLoading(true);
-      const data = await getSurahDetail(surahNumber);
-      setSurahData(data);
-      setLoading(false);
-    };
-    fetchDetail();
-  }, [surahNumber]);
+  const [fontSize, setFontSize] = useLocalStorage<number>('quran-font-size', 16);
+  const [autoplay, setAutoplay] = useLocalStorage('quran-autoplay', false);
+  const onEndedCallbackRef = useRef<() => void>();
 
   const handlePlayPause = useCallback((ayahNumber: number, audioUrl: string) => {
     const audioPlayer = audioRef.current;
@@ -91,6 +59,59 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
       }
     }
   }, [playingAyah, surahData, setLastRead]);
+
+  // Effect to update the 'ended' event callback with the latest state
+  useEffect(() => {
+    onEndedCallbackRef.current = () => {
+      if (!autoplay) {
+        setPlayingAyah(null);
+        return;
+      }
+      
+      const currentAyahIndex = surahData?.arabicAyahs.findIndex(
+          (ayah) => ayah.numberInSurah === playingAyah
+      );
+
+      if (surahData && typeof currentAyahIndex === 'number' && currentAyahIndex > -1 && currentAyahIndex < surahData.arabicAyahs.length - 1) {
+          const nextAyah = surahData.arabicAyahs[currentAyahIndex + 1];
+          handlePlayPause(nextAyah.numberInSurah, nextAyah.audio);
+      } else {
+          setPlayingAyah(null);
+      }
+    };
+  }, [autoplay, playingAyah, surahData, handlePlayPause]);
+
+  // Effect to initialize the audio player and its listener ONCE
+  useEffect(() => {
+    audioRef.current = new Audio();
+    const audioPlayer = audioRef.current;
+
+    const handlePlaybackEnd = () => {
+      onEndedCallbackRef.current?.();
+    };
+    audioPlayer.addEventListener('ended', handlePlaybackEnd);
+
+    return () => {
+      audioPlayer.pause();
+      audioPlayer.removeEventListener('ended', handlePlaybackEnd);
+    };
+  }, []);
+
+  // Effect to fetch surah data when the surahNumber changes.
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setPlayingAyah(null);
+    
+    const fetchDetail = async () => {
+      setLoading(true);
+      const data = await getSurahDetail(surahNumber);
+      setSurahData(data);
+      setLoading(false);
+    };
+    fetchDetail();
+  }, [surahNumber]);
 
   const toggleBookmark = (ayahNumber: number) => {
     const bookmarkId = `${surahNumber}:${ayahNumber}`;
@@ -125,14 +146,30 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
   
   return (
     <div className="animate-fade-in">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
         <button onClick={onBack} className="px-4 py-2 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700 transition-colors">
           &larr; Kembali ke Daftar Surah
         </button>
-        <div className="flex items-center space-x-2">
-            <span className="text-sm">Font Size:</span>
-            <button onClick={decreaseFontSize} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-lg">-</button>
-            <button onClick={increaseFontSize} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-lg">+</button>
+        <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+                <span className="text-sm">Font</span>
+                <button onClick={decreaseFontSize} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-lg">-</button>
+                <button onClick={increaseFontSize} className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-lg">+</button>
+            </div>
+            <div className="flex items-center space-x-2">
+                 <label htmlFor="autoplay-toggle" className="text-sm cursor-pointer select-none">Otomatis</label>
+                 <button
+                    id="autoplay-toggle"
+                    onClick={() => setAutoplay(prev => !prev)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${autoplay ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}`}
+                    role="switch"
+                    aria-checked={autoplay}
+                >
+                    <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoplay ? 'translate-x-5' : 'translate-x-0'}`}
+                    />
+                </button>
+            </div>
         </div>
       </div>
       
