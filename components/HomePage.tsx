@@ -5,7 +5,7 @@ import { Surah, LastRead } from '../types';
 import { SurahCard } from './SurahCard';
 
 interface HomePageProps {
-  onSurahClick: (surahNumber: number) => void;
+  onSurahClick: (surahNumber: number, ayahNumber?: number) => void;
   lastRead: LastRead | null;
 }
 
@@ -58,7 +58,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSurahClick, lastRead }) =>
                 <p className="font-bold">Terakhir Dibaca</p>
                 <p>
                     Anda terakhir membaca Surah {lastRead.surahName} ayat {lastRead.ayah}.
-                    <button onClick={() => onSurahClick(lastRead.surah)} className="ml-2 font-semibold underline hover:text-primary-600 dark:hover:text-primary-300">
+                    <button onClick={() => onSurahClick(lastRead.surah, lastRead.ayah)} className="ml-2 font-semibold underline hover:text-primary-600 dark:hover:text-primary-300">
                         Lanjutkan Membaca
                     </button>
                 </p>

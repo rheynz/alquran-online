@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [darkMode, setDarkMode] = useLocalStorage('quran-dark-mode', false);
   const [lastRead, setLastRead] = useLocalStorage<LastRead | null>('quran-last-read', null);
+  const [scrollToAyah, setScrollToAyah] = useState<number | null>(null);
 
   useEffect(() => {
     if (darkMode) {
@@ -23,14 +24,18 @@ const App: React.FC = () => {
     }
   }, [darkMode]);
 
-  const navigateToSurah = (surahNumber: number) => {
+  const navigateToSurah = (surahNumber: number, ayahNumber: number | null = null) => {
     setSelectedSurah(surahNumber);
     setView('surah');
-    window.scrollTo(0, 0);
+    setScrollToAyah(ayahNumber);
+    if (!ayahNumber) {
+        window.scrollTo(0, 0);
+    }
   };
   
   const navigateToHome = () => {
     setSelectedSurah(null);
+    setScrollToAyah(null);
     setView('home');
   };
 
@@ -41,7 +46,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (view) {
       case 'surah':
-        return selectedSurah ? <SurahDetailPage surahNumber={selectedSurah} onBack={navigateToHome} setLastRead={setLastRead} /> : <HomePage onSurahClick={navigateToSurah} lastRead={lastRead} />;
+        return selectedSurah ? <SurahDetailPage surahNumber={selectedSurah} onBack={navigateToHome} setLastRead={setLastRead} scrollToAyah={scrollToAyah} /> : <HomePage onSurahClick={navigateToSurah} lastRead={lastRead} />;
       case 'tajwid':
         return <TajwidPage />;
       case 'home':

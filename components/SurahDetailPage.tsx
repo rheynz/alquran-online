@@ -9,6 +9,7 @@ interface SurahDetailPageProps {
   surahNumber: number;
   onBack: () => void;
   setLastRead: (lastRead: LastRead | null) => void;
+  scrollToAyah: number | null;
 }
 
 const LoadingSkeleton: React.FC = () => (
@@ -28,7 +29,7 @@ const LoadingSkeleton: React.FC = () => (
     </div>
 );
 
-export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, onBack, setLastRead }) => {
+export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, onBack, setLastRead, scrollToAyah }) => {
   const [surahData, setSurahData] = useState<FullSurahData | null>(null);
   const [loading, setLoading] = useState(true);
   const [playingAyah, setPlayingAyah] = useState<number | null>(null);
@@ -113,6 +114,18 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
     fetchDetail();
   }, [surahNumber]);
 
+  // Effect for scrolling to last read ayah
+  useEffect(() => {
+    if (scrollToAyah && !loading && surahData) {
+        const element = document.getElementById(`ayah-${scrollToAyah}`);
+        if (element) {
+            setTimeout(() => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100); 
+        }
+    }
+  }, [scrollToAyah, loading, surahData]);
+
   const toggleBookmark = (ayahNumber: number) => {
     const bookmarkId = `${surahNumber}:${ayahNumber}`;
     setBookmarks(prev => 
@@ -126,7 +139,7 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
   const decreaseFontSize = () => setFontSize(s => Math.max(s - 2, 12));
   
   const fontStyles = {
-    arabic: { fontSize: `${fontSize * 1.75}px`, lineHeight: `${fontSize * 2.5}px` },
+    arabic: { fontSize: `${fontSize * 1.75}px`, lineHeight: `${fontSize * 2.8}px` },
     translation: { fontSize: `${fontSize}px` },
     transliteration: { fontSize: `${fontSize-2}px`}
   };
