@@ -126,6 +126,22 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
     }
   }, [scrollToAyah, loading, surahData]);
 
+  // Effect for auto-scrolling to the currently playing ayah
+  useEffect(() => {
+    if (playingAyah && !loading) {
+        const element = document.getElementById(`ayah-${playingAyah}`);
+        if (element) {
+            setTimeout(() => {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
+            }, 50);
+        }
+    }
+  }, [playingAyah, loading]);
+
+
   const toggleBookmark = (ayahNumber: number) => {
     const bookmarkId = `${surahNumber}:${ayahNumber}`;
     setBookmarks(prev => 
@@ -202,6 +218,7 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
                 return (
                     <AyahCard 
                         key={ayah.number}
+                        surahName={surahData.englishName}
                         ayahNumber={ayah.numberInSurah}
                         arabicText={ayah.text}
                         transliterationText={surahData.transliterationAyahs[index]?.text || ''}

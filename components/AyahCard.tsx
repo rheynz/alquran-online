@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { PlayIcon, PauseIcon, BookmarkIcon, BookmarkFilledIcon, CopyIcon, ShareIcon } from './icons';
 
 interface AyahCardProps {
+  surahName: string;
   ayahNumber: number;
   arabicText: string;
   transliterationText: string;
@@ -20,6 +21,7 @@ interface AyahCardProps {
 }
 
 export const AyahCard: React.FC<AyahCardProps> = ({
+  surahName,
   ayahNumber,
   arabicText,
   transliterationText,
@@ -33,7 +35,7 @@ export const AyahCard: React.FC<AyahCardProps> = ({
   const [copyStatus, setCopyStatus] = useState('Salin');
 
   const handleCopy = () => {
-    const textToCopy = `QS. [${ayahNumber}] \n${arabicText}\n\nTerjemahan: \n${translationText}`;
+    const textToCopy = `Surah ${surahName}, Ayat ${ayahNumber}\n\n${arabicText}\n\nTerjemahan:\n${translationText}`;
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopyStatus('Tersalin!');
       setTimeout(() => setCopyStatus('Salin'), 2000);
@@ -46,8 +48,8 @@ export const AyahCard: React.FC<AyahCardProps> = ({
 
   const handleShare = () => {
     const shareData = {
-      title: `Quran Ayat`,
-      text: `QS. [${ayahNumber}] \n${arabicText}\n\nTerjemahan: \n${translationText}`,
+      title: `Quran - Surah ${surahName}, Ayat ${ayahNumber}`,
+      text: `Surah ${surahName}, Ayat ${ayahNumber}\n\n${arabicText}\n\nTerjemahan:\n${translationText}`,
       url: window.location.href,
     };
     if (navigator.share) {
@@ -56,9 +58,14 @@ export const AyahCard: React.FC<AyahCardProps> = ({
       alert('Web Share API tidak didukung di browser ini. Coba salin ayatnya.');
     }
   };
+  
+  const cardBaseClasses = "p-6 rounded-lg shadow-sm border transition-all duration-300 hover:shadow-md";
+  const cardStateClasses = isPlaying
+    ? 'border-primary-500 dark:border-primary-400 bg-primary-50/70 dark:bg-gray-700/50 scale-[1.02]'
+    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
 
   return (
-    <div id={`ayah-${ayahNumber}`} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-shadow hover:shadow-md">
+    <div id={`ayah-${ayahNumber}`} className={`${cardBaseClasses} ${cardStateClasses}`}>
       <div className="flex justify-between items-start mb-4">
         <span className="text-lg font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-gray-700 px-3 py-1 rounded-md">
           {ayahNumber}
