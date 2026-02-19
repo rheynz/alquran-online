@@ -155,14 +155,14 @@ export const SurahDetailPage: React.FC<SurahDetailPageProps> = ({ surahNumber, o
   const decreaseFontSize = () => setFontSize(s => Math.max(s - 2, 12));
   
   const fontStyles = {
-    arabic: { fontSize: `${fontSize * 1.75}px`, lineHeight: `${fontSize * 2.8}px` },
+    arabic: { fontSize: `${fontSize * 1.75}px`, lineHeight: `${fontSize * 3.2}px` },
     translation: { fontSize: `${fontSize}px` },
     transliteration: { fontSize: `${fontSize-2}px`}
   };
 
   const SurahHeader = () => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 mb-8 text-center space-y-4">
-        <h1 className="text-4xl font-amiri font-bold text-primary-800 dark:text-primary-300">{surahData?.name}</h1>
+        <h1 className="text-4xl font-amiri font-bold text-primary-800 dark:text-primary-300 leading-relaxed">{surahData?.name}</h1>
         <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">{surahData?.englishName}</h2>
         <p className="text-gray-500 dark:text-gray-400">{surahData?.englishNameTranslation}</p>
         <div className="flex justify-center items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">

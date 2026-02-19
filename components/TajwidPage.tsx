@@ -19,7 +19,7 @@ export const TajwidPage: React.FC = () => {
             <TajwidCard title="Huruf Hijaiyah">
                 <p>Huruf Hijaiyah adalah alfabet dalam bahasa Arab, yang menjadi dasar membaca Al-Qur'an. Terdapat 28 huruf utama.</p>
                 <div dir="rtl" className="font-amiri text-3xl tracking-wider text-center bg-primary-50 dark:bg-gray-700 p-4 rounded-md">
-                    <p>
+                    <p className="leading-loose">
                         ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن و ه ء ي
                     </p>
                 </div>
@@ -33,7 +33,7 @@ export const TajwidPage: React.FC = () => {
                     <div>
                         <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200">1. Idzhar (إظهار) - Jelas</h4>
                         <p>Dibaca jelas tanpa dengung. Terjadi jika Nun Sukun/Tanwin bertemu dengan salah satu dari 6 huruf halq (tenggorokan): <span dir="rtl" className="font-amiri font-bold">ء هـ ع ح غ خ</span>.</p>
-                        <p className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-amiri text-xl" dir="rtl">Contoh: مِنْ خَيْرٍ</p>
+                        <p className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-amiri text-xl leading-relaxed" dir="rtl">Contoh: مِنْ خَيْرٍ</p>
                     </div>
                     <div>
                         <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200">2. Idgham (إدغام) - Melebur</h4>
@@ -46,12 +46,12 @@ export const TajwidPage: React.FC = () => {
                     <div>
                         <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200">3. Iqlab (إقلاب) - Mengganti</h4>
                         <p>Mengganti suara Nun Sukun/Tanwin menjadi suara Mim (م) disertai dengung. Terjadi jika bertemu huruf <span dir="rtl" className="font-amiri font-bold">ب</span>.</p>
-                        <p className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-amiri text-xl" dir="rtl">Contoh: مِنْ بَعْدِ</p>
+                        <p className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-amiri text-xl leading-relaxed" dir="rtl">Contoh: مِنْ بَعْدِ</p>
                     </div>
                     <div>
                         <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200">4. Ikhfa' (إخفاء) - Samar</h4>
                         <p>Menyamarkan suara Nun Sukun/Tanwin dengan dengung. Terjadi jika bertemu dengan 15 huruf sisa selain huruf-huruf di atas.</p>
-                         <p className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-amiri text-xl" dir="rtl">Contoh: إِنْسَانٌ</p>
+                         <p className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-amiri text-xl leading-relaxed" dir="rtl">Contoh: إِنْسَانٌ</p>
                     </div>
                 </div>
             </TajwidCard>

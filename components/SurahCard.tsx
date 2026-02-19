@@ -23,7 +23,7 @@ export const SurahCard: React.FC<SurahCardProps> = ({ surah, onClick }) => {
         </div>
       </div>
       <div className="text-right">
-        <p className="font-amiri text-xl font-bold text-primary-700 dark:text-primary-400">{surah.name}</p>
+        <p className="font-amiri text-xl font-bold text-primary-700 dark:text-primary-400 leading-relaxed">{surah.name}</p>
         <p className="text-sm text-gray-500 dark:text-gray-400">{surah.numberOfAyahs} Ayat</p>
       </div>
     </div>
