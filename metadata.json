@@ -1,0 +1,5 @@
+{
+  "name": "Quran Digital Modern",
+  "description": "A modern, lightweight, and responsive online Quran web application with features like surah browsing, audio playback per verse, dark mode, bookmarks, and a Tajwid learning section.",
+  "requestFramePermissions": []
+}
